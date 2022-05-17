@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Aircraft_war</string>
+    <string name="difficultySelect">难度选择</string>
+    <string name="easy">简单模式</string>
+    <string name="medium">普通模式</string>
+    <string name="hard">困难模式</string>
+    <string name="soundSelect">音效选择</string>
+</resources>
