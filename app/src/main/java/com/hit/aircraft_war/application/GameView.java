@@ -525,10 +525,6 @@ public abstract class GameView extends SurfaceView implements
         this.score = score;
     }
 
-    public void setHeroXY(int x, int y) {
-        heroAircraft.setLocation(x,y);
-    }
-
     public void setIsSoundOpen(boolean isOpen){
         isSoundOpen = isOpen;
     }

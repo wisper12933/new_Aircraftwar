@@ -52,6 +52,7 @@ public class GameActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg){
             if (msg.what == 0) {
+                RankActivity.newSCore = (int) msg.obj;
                 Intent intent = new Intent(GameActivity.this, RankActivity.class);
                 startActivity(intent);
                 finish();
