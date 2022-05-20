@@ -30,8 +30,8 @@
 
     <Button
         android:id="@+id/rank_deleteButton"
-        android:layout_width="200dp"
-        android:layout_height="60dp"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
         android:layout_marginBottom="16dp"
         android:text="@string/delete"
         android:textSize="20sp"

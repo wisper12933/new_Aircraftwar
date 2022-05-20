@@ -1,6 +1,5 @@
 package com.hit.aircraft_war;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,7 +19,7 @@ public class RankActivity extends AppCompatActivity {
         setContentView(R.layout.activity_rank);
 
         Date currentDate = new Date();
-        @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateString = dateFormat.format(currentDate);
     }
 }
