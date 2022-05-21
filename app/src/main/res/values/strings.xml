@@ -7,4 +7,8 @@
     <string name="soundSelect">音效选择</string>
     <string name="rank">排行榜</string>
     <string name="delete">删除</string>
+    <string name="rankNum">排名</string>
+    <string name="user">用户名</string>
+    <string name="score">得分</string>
+    <string name="playTime">游戏时间</string>
 </resources>

@@ -5,8 +5,10 @@
       <map>
         <entry key="..\:/Android file/Aircraft_war/app/src/main/res/layout/activity_game.xml" value="0.358695652173913" />
         <entry key="..\:/Android file/Aircraft_war/app/src/main/res/layout/activity_main.xml" value="0.4703703703703704" />
-        <entry key="..\:/Android file/Aircraft_war/app/src/main/res/layout/activity_rank.xml" value="0.33" />
+        <entry key="..\:/Android file/Aircraft_war/app/src/main/res/layout/activity_rank.xml" value="0.11797752808988764" />
         <entry key="..\:/Android file/Aircraft_war/app/src/main/res/layout/activity_rate.xml" value="0.17603850050658562" />
+        <entry key="..\:/Android file/Aircraft_war/app/src/main/res/layout/item_view.xml" value="0.23295454545454544" />
+        <entry key="..\:/Android file/Aircraft_war/app/src/main/res/layout/rank_item.xml" value="0.1752786220871327" />
       </map>
     </option>
   </component>
