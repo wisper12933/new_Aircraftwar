@@ -27,6 +27,6 @@ public class EasyView extends GameView {
 
     @Override
     public boolean heroShootRate() {
-        return this.time % 360 == 0;
+        return this.time % 300 == 0;
     }
 }

@@ -1,6 +1,8 @@
 package com.hit.aircraft_war;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -8,8 +10,23 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hit.aircraft_war.RankPack.RankAdapter;
+import com.hit.aircraft_war.RankPack.RankDao;
+import com.hit.aircraft_war.RankPack.RankDaoImpl;
 import com.hit.aircraft_war.RankPack.RankMember;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,35 +42,92 @@ public class RankActivity extends AppCompatActivity {
 
     private List<RankMember> dataList;
 
+    private RankDao rankDao;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rank);
 
-        Date currentDate = new Date();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateString = dateFormat.format(currentDate);
+        try {
+            initData();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        initData();
+        initRecyclerView();
+
+    }
+
+    @SuppressLint("SdCardPath")
+    private void initData() throws IOException {
+        rankDao = new RankDaoImpl();
+
+        File file;
+        Path path;
+        if (MainActivity.difficultChoice == 0){
+            file = new File("/data/data/com.hit.aircraft_war/files", "easyRank.txt");
+            path = Paths.get("/data/data/com.hit.aircraft_war/files/easyRank.txt");
+        }else if (MainActivity.difficultChoice == 1){
+            file = new File("/data/data/com.hit.aircraft_war/files", "mediumRank.txt");
+            path = Paths.get("/data/data/com.hit.aircraft_war/files/mediumRank.txt");
+        }else {
+            file = new File("/data/data/com.hit.aircraft_war/files", "hardRank.txt");
+            path = Paths.get("/data/data/com.hit.aircraft_war/files/hardRank.txt");
+        }
+
+        FileInputStream inputStream = new FileInputStream(file);
+        InputStreamReader reader = new InputStreamReader(inputStream);
+        BufferedReader bufferedReader = new BufferedReader(reader);
+        //读取文件
+        String lineTxt;
+        while ((lineTxt = bufferedReader.readLine()) != null) {
+            int txtRank = Integer.parseInt(lineTxt);
+            lineTxt = bufferedReader.readLine();
+            String txtName = lineTxt;
+            lineTxt = bufferedReader.readLine();
+            int txtScore = Integer.parseInt(lineTxt);
+            lineTxt = bufferedReader.readLine();
+            String txtTime = lineTxt;
+            rankDao.doAdd(new RankMember(txtRank, txtName, txtScore, txtTime));
+        }
+
+        //获取时间
+        Date currentDate = new Date();
+        @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateString = dateFormat.format(currentDate);
+        //添加新数据
+        RankMember newInfo = new RankMember(1, "TestPlayerName", newSCore, dateString);
+        rankDao.doAdd(newInfo);
+        //排序
+        rankDao.doSort();
+
+        //生成数据源
+        dataList = rankDao.getAllInformation();
+
+        //写文件
+        List<String> infoList = new ArrayList<>();
+        for (int i=0; i<dataList.size(); i++){
+            String infoRank = String.valueOf(dataList.get(i).getRank());
+            infoList.add(infoRank);
+            String infoName = dataList.get(i).getName();
+            infoList.add(infoName);
+            String infoScore = String.valueOf(dataList.get(i).getScore());
+            infoList.add(infoScore);
+            String infoTime = dataList.get(i).getTime();
+            infoList.add(infoTime);
+        }
+        Files.write(path, infoList, StandardOpenOption.WRITE);
+    }
+
+    private void initRecyclerView() {
         recyclerView = findViewById(R.id.rank_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
         rankAdapter = new RankAdapter(dataList);
         recyclerView.setAdapter(rankAdapter);
-
-
-    }
-
-    private void initData() {
-        dataList = new ArrayList<>();
-        dataList.add(new RankMember(1,"Lisa",1000,"2020.5.21"));
-        dataList.add(new RankMember(2,"Lisa",800,"2020.5.21"));
-        dataList.add(new RankMember(3,"Lisa",600,"2020.5.21"));
-        dataList.add(new RankMember(4,"Lisa",400,"2020.5.21"));
-        dataList.add(new RankMember(5,"Lisa",200,"2020.5.21"));
-        dataList.add(new RankMember(6,"Lisa",0,"2020.5.21"));
     }
 
 }

@@ -49,6 +49,6 @@ public class MediumView extends GameView {
 
     @Override
     public boolean heroShootRate() {
-        return this.time % 300 == 0;
+        return this.time % 260 == 0;
     }
 }
