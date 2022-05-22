@@ -11,4 +11,6 @@ public interface RankDao {
     void doDelete(String time);
 
     void  doSort();
+
+    RankMember doSearch(String time);
 }

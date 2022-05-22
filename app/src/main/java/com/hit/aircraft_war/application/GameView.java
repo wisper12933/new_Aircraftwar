@@ -541,6 +541,7 @@ public abstract class GameView extends SurfaceView implements
                 e.printStackTrace();
             }
         }
+
         Message msg = Message.obtain();
         msg.what = 0;
         msg.obj = score;

@@ -1,9 +1,16 @@
 package com.hit.aircraft_war;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -43,6 +50,11 @@ public class RankActivity extends AppCompatActivity {
     private List<RankMember> dataList;
 
     private RankDao rankDao;
+    private String dateString;
+    private String name;
+
+    private Path path;
+    private File file;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +62,26 @@ public class RankActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rank);
 
+        //初始化数据源，并保存数据到本地
         try {
             initData();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        //构建recyclerView
         initRecyclerView();
+
+        Button button1 = findViewById(R.id.rank_inputButton);
+        button1.setOnClickListener(V -> {
+            buttonAction();
+        });
+
+//        Button back = findViewById(R.id.rank_backButton);
+//        back.setOnClickListener(V -> {
+//            Intent intent = new Intent(RankActivity.this, MainActivity.class);
+//            startActivity(intent);
+//            finish();
+//        });
 
     }
 
@@ -64,8 +89,6 @@ public class RankActivity extends AppCompatActivity {
     private void initData() throws IOException {
         rankDao = new RankDaoImpl();
 
-        File file;
-        Path path;
         if (MainActivity.difficultChoice == 0){
             file = new File("/data/data/com.hit.aircraft_war/files", "easyRank.txt");
             path = Paths.get("/data/data/com.hit.aircraft_war/files/easyRank.txt");
@@ -96,7 +119,7 @@ public class RankActivity extends AppCompatActivity {
         //获取时间
         Date currentDate = new Date();
         @SuppressLint("SimpleDateFormat") DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateString = dateFormat.format(currentDate);
+        dateString = dateFormat.format(currentDate);
         //添加新数据
         RankMember newInfo = new RankMember(1, "TestPlayerName", newSCore, dateString);
         rankDao.doAdd(newInfo);
@@ -128,6 +151,29 @@ public class RankActivity extends AppCompatActivity {
 
         rankAdapter = new RankAdapter(dataList);
         recyclerView.setAdapter(rankAdapter);
+    }
+
+    private void buttonAction() {
+        final EditText inputServer = new EditText(this);
+        inputServer.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50)});
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("输入用户名").setIcon(R.drawable.ic_baseline_person_20).setView(inputServer)
+                .setNegativeButton("取消", null);
+        builder.setPositiveButton("确定", (dialog, which) -> {
+            String sign = inputServer.getText().toString();
+            if(!sign.isEmpty())
+            {
+                name = sign;
+                rankDao.doSearch(dateString).setName(name);
+                dataList = rankDao.getAllInformation();
+                recyclerView.setAdapter(new RankAdapter(dataList));
+            }
+            else
+            {
+                Toast.makeText(RankActivity.this,"用户名为空",Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.show();
     }
 
 }

@@ -34,4 +34,14 @@ public class RankDaoImpl implements RankDao{
             ranks.get(i).setRank(i+1);
         }
     }
+
+    @Override
+    public RankMember doSearch(String time) {
+        for (int i=0; i<ranks.size(); i++){
+            if (Objects.equals(ranks.get(i).getTime(), time)){
+                return ranks.get(i);
+            }
+        }
+        return null;
+    }
 }
