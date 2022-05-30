@@ -7,6 +7,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.Message;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -35,6 +38,7 @@ import com.hit.aircraft_war.supply.BombSupply;
 import com.hit.aircraft_war.supply.FireSupply;
 import com.hit.aircraft_war.supply.HpSupply;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -82,7 +86,6 @@ public abstract class GameView extends SurfaceView implements
     private int screenWidth = MainActivity.WIDTH;
 
     protected boolean changeBgm;
-    private boolean isSoundOpen;
     private int score = 0;
     protected int time = 0;
 
@@ -94,10 +97,28 @@ public abstract class GameView extends SurfaceView implements
     private int cycleTime = 0;
 
 
+
+
+    MediaPlayer bgmPlayer;
+    MediaPlayer bossBgmPlayer;
+    private SoundPool mSoundPool;
+    private HashMap<Integer, Integer> soundID = new HashMap<Integer, Integer>();
+
+
     public GameView(Context context) {
         super(context);
 
         loading_img();
+
+        bgmPlayer = MediaPlayer.create(context, R.raw.bgm);
+        bossBgmPlayer = MediaPlayer.create(context, R.raw.bgm_boss);
+        mSoundPool = new SoundPool(4, AudioManager.STREAM_SYSTEM, 5);
+        soundID.put(1, mSoundPool.load(context, R.raw.bullet_hit, 1));
+        soundID.put(2, mSoundPool.load(context, R.raw.game_over, 1));
+        soundID.put(3, mSoundPool.load(context, R.raw.bomb_explosion, 1));
+        soundID.put(4, mSoundPool.load(context, R.raw.bullet, 1));
+        soundID.put(5, mSoundPool.load(context, R.raw.get_supply, 1));
+
 
         mPaint = new Paint();//设置画笔
         mSurfaceHolder = this.getHolder();
@@ -114,10 +135,47 @@ public abstract class GameView extends SurfaceView implements
 
     }
 
+    public static void stopMusic(MediaPlayer player) {
+        if (player != null) {
+            player.stop();
+            player.reset();//重置
+            player.release();//释放
+        }
+    }
+
+    public void playBullet(){
+        mSoundPool.play(soundID.get(4), 1, 1, 0,0,1);
+    }
+
+    public void playGameOver(){
+        mSoundPool.play(soundID.get(2), 1, 1, 0, 0, 1);
+    }
+
+    public void playBulletHit() {
+        mSoundPool.play(soundID.get(1), 1, 1, 0, 0, 1);
+    }
+
+    public void playBombExplosion() {
+        mSoundPool.play(soundID.get(3), 1, 1, 0, 0, 1);
+    }
+
+    public void playGetSupply() {
+        mSoundPool.play(soundID.get(5), 1, 1, 0, 0, 1);
+    }
+
+
     /**
      * 游戏启动入口，执行游戏逻辑
      */
     public final void action() {
+
+
+        if(MainActivity.bgmFlag) {
+            bgmPlayer.setLooping(true);
+            if (bgmPlayer.isPlaying()) {
+                bgmPlayer.start();
+            }
+        }
 
         // 定时任务：绘制、对象产生、碰撞判定、击毁及结束判定
 
@@ -172,6 +230,9 @@ public abstract class GameView extends SurfaceView implements
         // 英雄机射出子弹
         if (heroShootRate()){
             heroBullets.addAll(heroAircraft.shoot());
+            if(MainActivity.bgmFlag) {
+                playBullet();
+            }
         }
 
         // 子弹移动
@@ -197,6 +258,12 @@ public abstract class GameView extends SurfaceView implements
 
         // 游戏结束检查
         if (heroAircraft.getHp() <= 0) {
+
+            if(MainActivity.bgmFlag) {
+                stopMusic(bgmPlayer);
+                stopMusic(bossBgmPlayer);
+                playGameOver();
+            }
             // 游戏结束
             gameOverFlag = true;
             System.out.println("Game Over!");
@@ -226,6 +293,9 @@ public abstract class GameView extends SurfaceView implements
                 //所有敌机都有shoot函数，但是Mob的shoot为空，无操作
                 enemyBullets.addAll(enemyAircrafts.get(i).shoot());
             }
+        }
+        if(MainActivity.bgmFlag) {
+            playBullet();
         }
 
     }
@@ -271,6 +341,10 @@ public abstract class GameView extends SurfaceView implements
                 // 英雄机撞击到敌机子弹
                 // 英雄机损失一定生命值
                 heroAircraft.decreaseHp(enemyBullets.get(i).getPower());
+
+                if(MainActivity.bgmFlag) {
+                    playBulletHit();
+                }
                 enemyBullets.get(i).vanish();
             }
         }
@@ -289,6 +363,11 @@ public abstract class GameView extends SurfaceView implements
                 if (enemyAircrafts.get(j).crash(heroBullets.get(i))) {
                     // 敌机撞击到英雄机子弹
                     // 敌机损失一定生命值
+
+                    if(MainActivity.bgmFlag) {
+                        playBulletHit();
+                    }
+
                     enemyAircrafts.get(j).decreaseHp(heroBullets.get(i).getPower());
                     heroBullets.get(i).vanish();
 
@@ -300,14 +379,23 @@ public abstract class GameView extends SurfaceView implements
                             // 限定只有80%的概率生成道具
                             score += 30;
                             int ran = (int)(Math.random()*100 +1);
-                               if (ran <= 90){
-                                   supply.add(enemyAircrafts.get(j).bonus());
-                               }
+                            if (ran <= 90){
+                                supply.add(enemyAircrafts.get(j).bonus());
+                            }
                         }else if (enemyAircrafts.get(j) instanceof BossEnemy){
                             // 先标记boss消失
                             // 再生成道具
                             bossAppearFlag = false;
                             score += 90;
+
+                            if(MainActivity.bgmFlag) {
+                                stopMusic(bossBgmPlayer);
+                                bgmPlayer.setLooping(true);
+                                if (bgmPlayer.isPlaying()){
+                                    bgmPlayer.start();}
+
+                            }
+
                             int propNum = ((BossEnemy) enemyAircrafts.get(j)).getPropNum();
                             for (int k=0; k<propNum; k++){
                                 //因为boss会生成两个道具，所以位置应该调整，并且boss没有y方向速度，所以要给道具添加上
@@ -339,17 +427,28 @@ public abstract class GameView extends SurfaceView implements
             //英雄机碰到道具
             if (heroAircraft.crash(supply.get(i))){
                 if (supply.get(i) instanceof HpSupply){
+
+
                     //加血道具
+                    if(MainActivity.bgmFlag) {
+                        playGetSupply();
+                    }
                     ((HpSupply) supply.get(i)).executeHp(heroAircraft);
 
                 }
                 else if (supply.get(i) instanceof FireSupply){
                     //火力道具生效15s
+                    if(MainActivity.bgmFlag) {
+                        playGetSupply();}
+
                     ((FireSupply) supply.get(i)).executeFire(heroAircraft);
 
                 }
                 else if (supply.get(i) instanceof BombSupply){
                     //炸弹道具
+                    if(MainActivity.bgmFlag) {
+                        playBombExplosion();}
+
                     //添加订阅者
                     for (int j=0 ; j<enemyBullets.size() ; j++){
                         ((BombSupply) supply.get(i)).addObject(enemyBullets.get(j));
@@ -525,9 +624,7 @@ public abstract class GameView extends SurfaceView implements
         this.score = score;
     }
 
-    public void setIsSoundOpen(boolean isOpen){
-        isSoundOpen = isOpen;
-    }
+
 
     @Override
     public void run(){
