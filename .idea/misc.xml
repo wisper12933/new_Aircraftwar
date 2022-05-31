@@ -3,8 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Android file/Aircraft_war/app/src/main/res/drawable/ic_baseline_airplanemode_active_24.xml" value="0.1" />
+        <entry key="..\:/Android file/Aircraft_war/app/src/main/res/drawable/ic_baseline_email_24.xml" value="0.1" />
+        <entry key="..\:/Android file/Aircraft_war/app/src/main/res/drawable/ic_baseline_lock_24.xml" value="0.1" />
         <entry key="..\:/Android file/Aircraft_war/app/src/main/res/drawable/ic_baseline_person_20.xml" value="0.1" />
         <entry key="..\:/Android file/Aircraft_war/app/src/main/res/layout/activity_game.xml" value="0.358695652173913" />
+        <entry key="..\:/Android file/Aircraft_war/app/src/main/res/layout/activity_login.xml" value="0.33" />
         <entry key="..\:/Android file/Aircraft_war/app/src/main/res/layout/activity_main.xml" value="0.4703703703703704" />
         <entry key="..\:/Android file/Aircraft_war/app/src/main/res/layout/activity_rank.xml" value="0.5" />
         <entry key="..\:/Android file/Aircraft_war/app/src/main/res/layout/activity_rate.xml" value="0.17603850050658562" />

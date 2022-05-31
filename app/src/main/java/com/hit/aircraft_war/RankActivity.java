@@ -76,13 +76,6 @@ public class RankActivity extends AppCompatActivity {
             buttonAction();
         });
 
-//        Button back = findViewById(R.id.rank_backButton);
-//        back.setOnClickListener(V -> {
-//            Intent intent = new Intent(RankActivity.this, MainActivity.class);
-//            startActivity(intent);
-//            finish();
-//        });
-
     }
 
     @SuppressLint("SdCardPath")
